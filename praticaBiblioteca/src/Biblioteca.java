@@ -47,8 +47,13 @@ class Biblioteca {
     }
 
     public void emprestarLivro(String titulo, int idUsuario) {
-        Livro livro = livros.stream().filter(l -> l.getTitulo().equalsIgnoreCase(titulo) && l.isDisponivel())
-                .findFirst().orElse(null);
+        Livro livro = null;
+        for (Livro l : livros) {
+            if (l.getTitulo().equalsIgnoreCase(titulo) && l.isDisponivel()) {
+                livro = l;
+                break;
+            }
+        }
         if (livro == null) {
             System.out.println("Livro não disponível para empréstimo.");
             return;
@@ -66,15 +71,26 @@ class Biblioteca {
     }
 
     public void devolverLivro(String titulo, int idUsuario) {
-        Usuario usuario = usuarios.stream().filter(u -> u.getId() == idUsuario).findFirst().orElse(null);
+        Usuario usuario = null;
+        for (Usuario u : usuarios) {
+            if (u.getId() == idUsuario) {
+                usuario = u;
+                break;
+            }
+        }
+
         if (usuario == null) {
             System.out.println("Usuário não encontrado.");
             return;
         }
 
         if (usuario.getLivrosEmprestados().remove(titulo)) {
-            livros.stream().filter(l -> l.getTitulo().equalsIgnoreCase(titulo)).findFirst()
-                    .ifPresent(l -> l.setDisponivel(true));
+            for (Livro l : livros) {
+                if (l.getTitulo().equalsIgnoreCase(titulo)) {
+                    l.setDisponivel(true);
+                    break;
+                }
+            }
             System.out.println("Livro devolvido com sucesso.");
         } else {
             System.out.println("Livro não encontrado nos empréstimos do usuário.");
